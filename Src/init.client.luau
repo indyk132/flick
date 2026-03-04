@@ -498,6 +498,17 @@ TextXAlignment = Enum.TextXAlignment.Left,
 RichText = true,
 Parent = AboutSection,
 })
+Interface.New("TextLabel", {
+BackgroundTransparency = 1,
+Size = UDim2.new(1, 0, 0, 20),
+Text = "Creator: <b>04xSkater</b>",
+TextColor3 = Theme.TextMuted,
+TextSize = 12,
+Font = Enum.Font.GothamMedium,
+TextXAlignment = Enum.TextXAlignment.Left,
+RichText = true,
+Parent = AboutSection,
+})
 -- ============================================================
 -- OPTION ELEMENT BUILDERS
 -- ============================================================
