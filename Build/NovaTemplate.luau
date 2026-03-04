@@ -5,109 +5,63 @@ local ImportGlobals
 
 -- Holds direct closure data (defining this before the DOM tree for line debugging etc)
 local ClosureBindings = {
-    [6] = function()local wax,script,require=ImportGlobals(6)local ImportGlobals return (function(...)--[[
-	Icons Module - Template
-	Fetches and manages Lucide icons for the UI.
-	Uses deividcomsono's lucide-roblox-direct for icon spritesheet.
+    [10] = function()local wax,script,require=ImportGlobals(10)local ImportGlobals return (function(...)--[[
+	Theme Module - Template (Based on Nova)
+	Centralized color definitions for consistent UI theming.
 	
 	Usage:
-		local Icons = require(path.to.Icons)
-		
-		-- Apply icon to ImageLabel
-		Icons.ApplyIcon(imageLabel, "settings")
-		Icons.ApplyIcon(imageLabel, "home")
-		
-		-- Get icon data
-		local iconData = Icons.GetIcon("user")
-		if iconData then
-			print(iconData.Url, iconData.ImageRectOffset, iconData.ImageRectSize)
-		end
+		local Theme = require(path.to.Theme)
+		frame.BackgroundColor3 = Theme.Background
 ]]
 
-local Icons = {}
-
-export type IconData = {
-	Url: string,
-	Id: number,
-	IconName: string,
-	ImageRectOffset: Vector2,
-	ImageRectSize: Vector2,
+local Theme = {
+	-- Base colors
+	Background = Color3.fromRGB(15, 15, 15),
+	Surface = Color3.fromRGB(20, 20, 20),
+	SurfaceHover = Color3.fromRGB(28, 28, 28),
+	
+	-- Border colors
+	Border = Color3.fromRGB(40, 40, 40),
+	BorderLight = Color3.fromRGB(55, 55, 55),
+	
+	-- Text colors
+	Text = Color3.fromRGB(220, 220, 220),
+	TextMuted = Color3.fromRGB(140, 140, 140),
+	
+	-- Accent colors
+	Accent = Color3.fromRGB(88, 101, 242),
+	AccentHover = Color3.fromRGB(98, 111, 252),
+	
+	-- Status colors
+	Success = Color3.fromRGB(63, 185, 80),
+	Warning = Color3.fromRGB(210, 153, 34),
+	Error = Color3.fromRGB(248, 81, 73),
+	Info = Color3.fromRGB(88, 166, 255),
+	
+	-- Direction colors (from Nova's Incoming/Outgoing)
+	Primary = Color3.fromRGB(63, 185, 80),
+	Secondary = Color3.fromRGB(247, 129, 102),
 }
 
--- Try to load the icons module
-local Success, IconsModule = pcall(function()
-	local IconFetchSuccess, IconModuleSource = pcall(request, {
-		Url = "https://raw.githubusercontent.com/deividcomsono/lucide-roblox-direct/refs/heads/main/source.lua",
-		Method = "GET",
-	})
-
-	assert(
-		IconFetchSuccess and IconModuleSource.Success or IconModuleSource.StatusCode >= 200 and IconModuleSource.StatusCode < 300,
-		"Failed to fetch lucide icons direct module source"
+-- Utility function to lighten a color
+function Theme.Lighten(color: Color3, amount: number): Color3
+	return Color3.new(
+		math.min(color.R + amount, 1),
+		math.min(color.G + amount, 1),
+		math.min(color.B + amount, 1)
 	)
-	return (loadstring(IconModuleSource.Body) :: () -> { Icons: { string }, GetAsset: (Name: string) -> IconData? })()
-end)
-
-if not Success then
-	warn("[Icons] Failed to load Lucide icons module. Icons will not be available.")
 end
 
---[[
-	Get icon data by name
-	@param iconName The name of the Lucide icon
-	@return IconData or nil if not found
-]]
-function Icons.GetIcon(iconName: string): IconData?
-	if not Success or not IconsModule then
-		return nil
-	end
-
-	local success, icon = pcall(IconsModule.GetAsset, iconName)
-	if not success then
-		return nil
-	end
-
-	return icon
+-- Utility function to darken a color
+function Theme.Darken(color: Color3, amount: number): Color3
+	return Color3.new(
+		math.max(color.R - amount, 0),
+		math.max(color.G - amount, 0),
+		math.max(color.B - amount, 0)
+	)
 end
 
---[[
-	Apply icon to an ImageLabel
-	@param imageLabel The ImageLabel to apply the icon to
-	@param iconName The name of the Lucide icon
-	@return boolean indicating success
-]]
-function Icons.ApplyIcon(imageLabel: ImageLabel, iconName: string): boolean
-	local icon = Icons.GetIcon(iconName)
-	if not icon then
-		return false
-	end
-
-	imageLabel.Image = icon.Url
-	imageLabel.ImageRectOffset = icon.ImageRectOffset
-	imageLabel.ImageRectSize = icon.ImageRectSize
-	return true
-end
-
---[[
-	Check if icons are available
-	@return boolean
-]]
-function Icons.IsAvailable(): boolean
-	return Success and IconsModule ~= nil
-end
-
---[[
-	Get list of all available icon names
-	@return Array of icon names or empty array if not loaded
-]]
-function Icons.GetAllIconNames(): { string }
-	if not Success or not IconsModule or not IconsModule.Icons then
-		return {}
-	end
-	return IconsModule.Icons
-end
-
-return Icons
+return Theme
 
 end)() end,
     [2] = function()local wax,script,require=ImportGlobals(2)local ImportGlobals return (function(...)--[[
@@ -583,7 +537,7 @@ Interface.New("TextLabel", {
 BackgroundTransparency = 1,
 Size = UDim2.new(1, -34, 1, 0),
 Position = UDim2.new(0, 30, 0, 0),
-Text = "Unload Flick",
+Text = "Unload Nova",
 TextColor3 = Theme.Error,
 TextSize = 13,
 Font = Enum.Font.GothamBold,
@@ -1404,7 +1358,6 @@ MiscCat:AddButton("Anti-Cheat Bypass", function()
 pcall(function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/refs/heads/main/Source.lua"))()
 end)
-Library:Notify("Anti-cheat bypass executed!", "success")
 end)
 MiscCat:AddSeparator()
 MiscCat:AddButton("Rejoin", function()
@@ -2009,63 +1962,232 @@ Library:Notify("Flick loaded!", "success")
 
 return Library
 end)() end,
-    [10] = function()local wax,script,require=ImportGlobals(10)local ImportGlobals return (function(...)--[[
-	Theme Module - Template (Based on Nova)
-	Centralized color definitions for consistent UI theming.
+    [9] = function()local wax,script,require=ImportGlobals(9)local ImportGlobals return (function(...)--[[
+	Sonner Module - Template
+	Toast notification system inspired by Emil Kowalski's Sonner.
 	
 	Usage:
-		local Theme = require(path.to.Theme)
-		frame.BackgroundColor3 = Theme.Background
+		local Sonner = require(path.to.Sonner)
+		
+		-- Initialize with parent ScreenGui
+		Sonner.Initialize(screenGui)
+		
+		-- Show notifications
+		Sonner.info("Information message")
+		Sonner.success("Operation successful!")
+		Sonner.warning("Warning message")
+		Sonner.error("Something went wrong")
+		Sonner.toast("Simple toast message")
 ]]
 
-local Theme = {
-	-- Base colors
-	Background = Color3.fromRGB(15, 15, 15),
-	Surface = Color3.fromRGB(20, 20, 20),
-	SurfaceHover = Color3.fromRGB(28, 28, 28),
-	
-	-- Border colors
-	Border = Color3.fromRGB(40, 40, 40),
-	BorderLight = Color3.fromRGB(55, 55, 55),
-	
-	-- Text colors
-	Text = Color3.fromRGB(220, 220, 220),
-	TextMuted = Color3.fromRGB(140, 140, 140),
-	
-	-- Accent colors
-	Accent = Color3.fromRGB(88, 101, 242),
-	AccentHover = Color3.fromRGB(98, 111, 252),
-	
-	-- Status colors
-	Success = Color3.fromRGB(63, 185, 80),
-	Warning = Color3.fromRGB(210, 153, 34),
-	Error = Color3.fromRGB(248, 81, 73),
-	Info = Color3.fromRGB(88, 166, 255),
-	
-	-- Direction colors (from Nova's Incoming/Outgoing)
-	Primary = Color3.fromRGB(63, 185, 80),
-	Secondary = Color3.fromRGB(247, 129, 102),
+local Sonner = {
+	Queue = {},
+	TweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Exponential),
+	Wrapper = nil,
+	PendingQueue = {},
+	Processing = false,
 }
 
--- Utility function to lighten a color
-function Theme.Lighten(color: Color3, amount: number): Color3
-	return Color3.new(
-		math.min(color.R + amount, 1),
-		math.min(color.G + amount, 1),
-		math.min(color.B + amount, 1)
-	)
+local TweenService = game:GetService("TweenService")
+
+-- Default notification icons (Lucide icon names)
+local NotificationIcons = {
+	info = "info",
+	success = "circle-check",
+	warning = "triangle-alert",
+	error = "circle-alert",
+	loading = "loader-circle",
+}
+
+-- Optional Icons module reference (set via Initialize)
+local Icons = nil
+
+local function CreateNotificationObject(zindex: number, iconName: string?, text: string)
+	-- Main notification container
+	local notification = Instance.new("CanvasGroup")
+	notification.BorderSizePixel = 0
+	notification.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	notification.AnchorPoint = Vector2.new(0.5, 1)
+	notification.Size = UDim2.new(1, 0, 0, 42)
+	notification.GroupTransparency = 1
+	notification.ZIndex = zindex
+	notification.Position = UDim2.new(0.5, 0, 1, 50)
+
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 8)
+	corner.Parent = notification
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(40, 40, 40)
+	stroke.Thickness = 1
+	stroke.Parent = notification
+
+	-- Icon (if provided and Icons module available)
+	local hasIcon = iconName and Icons
+	if hasIcon then
+		local iconLabel = Instance.new("ImageLabel")
+		iconLabel.BackgroundTransparency = 1
+		iconLabel.Size = UDim2.fromOffset(16, 16)
+		iconLabel.Position = UDim2.new(0, 12, 0.5, 0)
+		iconLabel.AnchorPoint = Vector2.new(0, 0.5)
+		iconLabel.ImageColor3 = Color3.fromRGB(200, 200, 200)
+		iconLabel.Parent = notification
+
+		if Icons.ApplyIcon then
+			Icons.ApplyIcon(iconLabel, iconName)
+		end
+	end
+
+	-- Text
+	local textLabel = Instance.new("TextLabel")
+	textLabel.BackgroundTransparency = 1
+	textLabel.Size = UDim2.new(1, -44, 1, 0)
+	textLabel.Position = UDim2.new(0, hasIcon and 36 or 12, 0, 0)
+	textLabel.Text = text
+	textLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+	textLabel.TextSize = 13
+	textLabel.Font = Enum.Font.GothamMedium
+	textLabel.TextXAlignment = Enum.TextXAlignment.Left
+	textLabel.TextTruncate = Enum.TextTruncate.AtEnd
+	textLabel.Parent = notification
+
+	return notification
 end
 
--- Utility function to darken a color
-function Theme.Darken(color: Color3, amount: number): Color3
-	return Color3.new(
-		math.max(color.R - amount, 0),
-		math.max(color.G - amount, 0),
-		math.max(color.B - amount, 0)
-	)
+local function ProcessQueue()
+	if Sonner.Processing then
+		return
+	end
+	Sonner.Processing = true
+
+	while #Sonner.PendingQueue > 0 do
+		local entry = table.remove(Sonner.PendingQueue, 1)
+		local notif = entry.notif
+		local duration = entry.duration or 4.5
+
+		if Sonner.Wrapper then
+			notif.Parent = Sonner.Wrapper
+
+			-- Animate in
+			TweenService:Create(notif, Sonner.TweenInfo, {
+				Position = UDim2.new(0.5, 0, 1, -8),
+				GroupTransparency = 0,
+			}):Play()
+
+			-- Auto dismiss
+			task.delay(duration, function()
+				local tween = TweenService:Create(notif, Sonner.TweenInfo, {
+					Position = UDim2.new(0.5, 0, 1, 50),
+					GroupTransparency = 1,
+				})
+				tween:Play()
+				tween.Completed:Connect(function()
+					notif:Destroy()
+
+					-- Remove from queue
+					local index = table.find(Sonner.Queue, notif)
+					if index then
+						table.remove(Sonner.Queue, index)
+					end
+				end)
+			end)
+		end
+	end
+
+	Sonner.Processing = false
 end
 
-return Theme
+local function ShowToast(iconName: string?, text: string, duration: number?)
+	if not Sonner.Wrapper then
+		return
+	end
+
+	local zindex = #Sonner.Queue + 1
+	local notif = CreateNotificationObject(zindex, iconName, text)
+
+	table.insert(Sonner.Queue, notif)
+	table.insert(Sonner.PendingQueue, {
+		notif = notif,
+		duration = duration or 4.5,
+	})
+
+	task.spawn(ProcessQueue)
+end
+
+--[[
+	Initialize Sonner with a parent ScreenGui
+	@param parent The ScreenGui to parent notifications to
+	@param iconsModule Optional Icons module for displaying icons
+]]
+function Sonner.Initialize(parent: ScreenGui, iconsModule: any?)
+	Icons = iconsModule
+
+	Sonner.Wrapper = Instance.new("Frame")
+	Sonner.Wrapper.BackgroundTransparency = 1
+	Sonner.Wrapper.Size = UDim2.new(0, 360, 0, 200)
+	Sonner.Wrapper.Position = UDim2.new(0.5, 0, 1, -20)
+	Sonner.Wrapper.AnchorPoint = Vector2.new(0.5, 1)
+	Sonner.Wrapper.ZIndex = 100000
+	Sonner.Wrapper.Parent = parent
+end
+
+--[[
+	Show an info notification
+	@param text The notification text
+	@param duration Optional duration in seconds (default: 4.5)
+]]
+function Sonner.info(text: string, duration: number?)
+	ShowToast(NotificationIcons.info, text, duration)
+end
+
+--[[
+	Show a success notification
+	@param text The notification text
+	@param duration Optional duration in seconds (default: 4.5)
+]]
+function Sonner.success(text: string, duration: number?)
+	ShowToast(NotificationIcons.success, text, duration)
+end
+
+--[[
+	Show a warning notification
+	@param text The notification text
+	@param duration Optional duration in seconds (default: 4.5)
+]]
+function Sonner.warning(text: string, duration: number?)
+	ShowToast(NotificationIcons.warning, text, duration)
+end
+
+--[[
+	Show an error notification
+	@param text The notification text
+	@param duration Optional duration in seconds (default: 4.5)
+]]
+function Sonner.error(text: string, duration: number?)
+	ShowToast(NotificationIcons.error, text, duration)
+end
+
+--[[
+	Show a simple toast without icon
+	@param text The notification text
+	@param duration Optional duration in seconds (default: 4.5)
+]]
+function Sonner.toast(text: string, duration: number?)
+	ShowToast(nil, text, duration)
+end
+
+--[[
+	Clear all active notifications
+]]
+function Sonner.clear()
+	for _, notif in ipairs(Sonner.Queue) do
+		notif:Destroy()
+	end
+	Sonner.Queue = {}
+	Sonner.PendingQueue = {}
+end
+
+return Sonner
 
 end)() end,
     [7] = function()local wax,script,require=ImportGlobals(7)local ImportGlobals return (function(...)--[[
@@ -2411,232 +2533,109 @@ end
 return Resize
 
 end)() end,
-    [9] = function()local wax,script,require=ImportGlobals(9)local ImportGlobals return (function(...)--[[
-	Sonner Module - Template
-	Toast notification system inspired by Emil Kowalski's Sonner.
+    [6] = function()local wax,script,require=ImportGlobals(6)local ImportGlobals return (function(...)--[[
+	Icons Module - Template
+	Fetches and manages Lucide icons for the UI.
+	Uses deividcomsono's lucide-roblox-direct for icon spritesheet.
 	
 	Usage:
-		local Sonner = require(path.to.Sonner)
+		local Icons = require(path.to.Icons)
 		
-		-- Initialize with parent ScreenGui
-		Sonner.Initialize(screenGui)
+		-- Apply icon to ImageLabel
+		Icons.ApplyIcon(imageLabel, "settings")
+		Icons.ApplyIcon(imageLabel, "home")
 		
-		-- Show notifications
-		Sonner.info("Information message")
-		Sonner.success("Operation successful!")
-		Sonner.warning("Warning message")
-		Sonner.error("Something went wrong")
-		Sonner.toast("Simple toast message")
+		-- Get icon data
+		local iconData = Icons.GetIcon("user")
+		if iconData then
+			print(iconData.Url, iconData.ImageRectOffset, iconData.ImageRectSize)
+		end
 ]]
 
-local Sonner = {
-	Queue = {},
-	TweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Exponential),
-	Wrapper = nil,
-	PendingQueue = {},
-	Processing = false,
+local Icons = {}
+
+export type IconData = {
+	Url: string,
+	Id: number,
+	IconName: string,
+	ImageRectOffset: Vector2,
+	ImageRectSize: Vector2,
 }
 
-local TweenService = game:GetService("TweenService")
-
--- Default notification icons (Lucide icon names)
-local NotificationIcons = {
-	info = "info",
-	success = "circle-check",
-	warning = "triangle-alert",
-	error = "circle-alert",
-	loading = "loader-circle",
-}
-
--- Optional Icons module reference (set via Initialize)
-local Icons = nil
-
-local function CreateNotificationObject(zindex: number, iconName: string?, text: string)
-	-- Main notification container
-	local notification = Instance.new("CanvasGroup")
-	notification.BorderSizePixel = 0
-	notification.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-	notification.AnchorPoint = Vector2.new(0.5, 1)
-	notification.Size = UDim2.new(1, 0, 0, 42)
-	notification.GroupTransparency = 1
-	notification.ZIndex = zindex
-	notification.Position = UDim2.new(0.5, 0, 1, 50)
-
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 8)
-	corner.Parent = notification
-
-	local stroke = Instance.new("UIStroke")
-	stroke.Color = Color3.fromRGB(40, 40, 40)
-	stroke.Thickness = 1
-	stroke.Parent = notification
-
-	-- Icon (if provided and Icons module available)
-	local hasIcon = iconName and Icons
-	if hasIcon then
-		local iconLabel = Instance.new("ImageLabel")
-		iconLabel.BackgroundTransparency = 1
-		iconLabel.Size = UDim2.fromOffset(16, 16)
-		iconLabel.Position = UDim2.new(0, 12, 0.5, 0)
-		iconLabel.AnchorPoint = Vector2.new(0, 0.5)
-		iconLabel.ImageColor3 = Color3.fromRGB(200, 200, 200)
-		iconLabel.Parent = notification
-
-		if Icons.ApplyIcon then
-			Icons.ApplyIcon(iconLabel, iconName)
-		end
-	end
-
-	-- Text
-	local textLabel = Instance.new("TextLabel")
-	textLabel.BackgroundTransparency = 1
-	textLabel.Size = UDim2.new(1, -44, 1, 0)
-	textLabel.Position = UDim2.new(0, hasIcon and 36 or 12, 0, 0)
-	textLabel.Text = text
-	textLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
-	textLabel.TextSize = 13
-	textLabel.Font = Enum.Font.GothamMedium
-	textLabel.TextXAlignment = Enum.TextXAlignment.Left
-	textLabel.TextTruncate = Enum.TextTruncate.AtEnd
-	textLabel.Parent = notification
-
-	return notification
-end
-
-local function ProcessQueue()
-	if Sonner.Processing then
-		return
-	end
-	Sonner.Processing = true
-
-	while #Sonner.PendingQueue > 0 do
-		local entry = table.remove(Sonner.PendingQueue, 1)
-		local notif = entry.notif
-		local duration = entry.duration or 4.5
-
-		if Sonner.Wrapper then
-			notif.Parent = Sonner.Wrapper
-
-			-- Animate in
-			TweenService:Create(notif, Sonner.TweenInfo, {
-				Position = UDim2.new(0.5, 0, 1, -8),
-				GroupTransparency = 0,
-			}):Play()
-
-			-- Auto dismiss
-			task.delay(duration, function()
-				local tween = TweenService:Create(notif, Sonner.TweenInfo, {
-					Position = UDim2.new(0.5, 0, 1, 50),
-					GroupTransparency = 1,
-				})
-				tween:Play()
-				tween.Completed:Connect(function()
-					notif:Destroy()
-
-					-- Remove from queue
-					local index = table.find(Sonner.Queue, notif)
-					if index then
-						table.remove(Sonner.Queue, index)
-					end
-				end)
-			end)
-		end
-	end
-
-	Sonner.Processing = false
-end
-
-local function ShowToast(iconName: string?, text: string, duration: number?)
-	if not Sonner.Wrapper then
-		return
-	end
-
-	local zindex = #Sonner.Queue + 1
-	local notif = CreateNotificationObject(zindex, iconName, text)
-
-	table.insert(Sonner.Queue, notif)
-	table.insert(Sonner.PendingQueue, {
-		notif = notif,
-		duration = duration or 4.5,
+-- Try to load the icons module
+local Success, IconsModule = pcall(function()
+	local IconFetchSuccess, IconModuleSource = pcall(request, {
+		Url = "https://raw.githubusercontent.com/deividcomsono/lucide-roblox-direct/refs/heads/main/source.lua",
+		Method = "GET",
 	})
 
-	task.spawn(ProcessQueue)
+	assert(
+		IconFetchSuccess and IconModuleSource.Success or IconModuleSource.StatusCode >= 200 and IconModuleSource.StatusCode < 300,
+		"Failed to fetch lucide icons direct module source"
+	)
+	return (loadstring(IconModuleSource.Body) :: () -> { Icons: { string }, GetAsset: (Name: string) -> IconData? })()
+end)
+
+if not Success then
+	warn("[Icons] Failed to load Lucide icons module. Icons will not be available.")
 end
 
 --[[
-	Initialize Sonner with a parent ScreenGui
-	@param parent The ScreenGui to parent notifications to
-	@param iconsModule Optional Icons module for displaying icons
+	Get icon data by name
+	@param iconName The name of the Lucide icon
+	@return IconData or nil if not found
 ]]
-function Sonner.Initialize(parent: ScreenGui, iconsModule: any?)
-	Icons = iconsModule
-
-	Sonner.Wrapper = Instance.new("Frame")
-	Sonner.Wrapper.BackgroundTransparency = 1
-	Sonner.Wrapper.Size = UDim2.new(0, 360, 0, 200)
-	Sonner.Wrapper.Position = UDim2.new(0.5, 0, 1, -20)
-	Sonner.Wrapper.AnchorPoint = Vector2.new(0.5, 1)
-	Sonner.Wrapper.ZIndex = 100000
-	Sonner.Wrapper.Parent = parent
-end
-
---[[
-	Show an info notification
-	@param text The notification text
-	@param duration Optional duration in seconds (default: 4.5)
-]]
-function Sonner.info(text: string, duration: number?)
-	ShowToast(NotificationIcons.info, text, duration)
-end
-
---[[
-	Show a success notification
-	@param text The notification text
-	@param duration Optional duration in seconds (default: 4.5)
-]]
-function Sonner.success(text: string, duration: number?)
-	ShowToast(NotificationIcons.success, text, duration)
-end
-
---[[
-	Show a warning notification
-	@param text The notification text
-	@param duration Optional duration in seconds (default: 4.5)
-]]
-function Sonner.warning(text: string, duration: number?)
-	ShowToast(NotificationIcons.warning, text, duration)
-end
-
---[[
-	Show an error notification
-	@param text The notification text
-	@param duration Optional duration in seconds (default: 4.5)
-]]
-function Sonner.error(text: string, duration: number?)
-	ShowToast(NotificationIcons.error, text, duration)
-end
-
---[[
-	Show a simple toast without icon
-	@param text The notification text
-	@param duration Optional duration in seconds (default: 4.5)
-]]
-function Sonner.toast(text: string, duration: number?)
-	ShowToast(nil, text, duration)
-end
-
---[[
-	Clear all active notifications
-]]
-function Sonner.clear()
-	for _, notif in ipairs(Sonner.Queue) do
-		notif:Destroy()
+function Icons.GetIcon(iconName: string): IconData?
+	if not Success or not IconsModule then
+		return nil
 	end
-	Sonner.Queue = {}
-	Sonner.PendingQueue = {}
+
+	local success, icon = pcall(IconsModule.GetAsset, iconName)
+	if not success then
+		return nil
+	end
+
+	return icon
 end
 
-return Sonner
+--[[
+	Apply icon to an ImageLabel
+	@param imageLabel The ImageLabel to apply the icon to
+	@param iconName The name of the Lucide icon
+	@return boolean indicating success
+]]
+function Icons.ApplyIcon(imageLabel: ImageLabel, iconName: string): boolean
+	local icon = Icons.GetIcon(iconName)
+	if not icon then
+		return false
+	end
+
+	imageLabel.Image = icon.Url
+	imageLabel.ImageRectOffset = icon.ImageRectOffset
+	imageLabel.ImageRectSize = icon.ImageRectSize
+	return true
+end
+
+--[[
+	Check if icons are available
+	@return boolean
+]]
+function Icons.IsAvailable(): boolean
+	return Success and IconsModule ~= nil
+end
+
+--[[
+	Get list of all available icon names
+	@return Array of icon names or empty array if not loaded
+]]
+function Icons.GetAllIconNames(): { string }
+	if not Success or not IconsModule or not IconsModule.Icons then
+		return {}
+	end
+	return IconsModule.Icons
+end
+
+return Icons
 
 end)() end,
     [5] = function()local wax,script,require=ImportGlobals(5)local ImportGlobals return (function(...)--[[
@@ -2950,13 +2949,6 @@ local ObjectTree = {
                         },
                         {
                             {
-                                4,
-                                2,
-                                {
-                                    "Drag"
-                                }
-                            },
-                            {
                                 10,
                                 2,
                                 {
@@ -2964,17 +2956,10 @@ local ObjectTree = {
                                 }
                             },
                             {
-                                6,
+                                4,
                                 2,
                                 {
-                                    "Icons"
-                                }
-                            },
-                            {
-                                9,
-                                2,
-                                {
-                                    "Sonner"
+                                    "Drag"
                                 }
                             },
                             {
@@ -2985,10 +2970,10 @@ local ObjectTree = {
                                 }
                             },
                             {
-                                7,
+                                6,
                                 2,
                                 {
-                                    "Interface"
+                                    "Icons"
                                 }
                             },
                             {
@@ -2996,6 +2981,20 @@ local ObjectTree = {
                                 2,
                                 {
                                     "Helper"
+                                }
+                            },
+                            {
+                                7,
+                                2,
+                                {
+                                    "Interface"
+                                }
+                            },
+                            {
+                                9,
+                                2,
+                                {
+                                    "Sonner"
                                 }
                             }
                         }
@@ -3008,14 +3007,14 @@ local ObjectTree = {
 
 -- Line offsets for debugging (only included when minifyTables is false)
 local LineOffsets = {
-    [10] = 2012,
-    [2] = 113,
-    [7] = 2071,
-    [6] = 8,
-    [8] = 2275,
-    [9] = 2414,
-    [5] = 2642,
-    [4] = 2824
+    [7] = 2193,
+    [9] = 1965,
+    [2] = 67,
+    [10] = 8,
+    [8] = 2397,
+    [6] = 2536,
+    [5] = 2641,
+    [4] = 2823
 }
 
 -- Misc AOT variable imports

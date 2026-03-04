@@ -471,7 +471,7 @@ Interface.New("TextLabel", {
 BackgroundTransparency = 1,
 Size = UDim2.new(1, -34, 1, 0),
 Position = UDim2.new(0, 30, 0, 0),
-Text = "Unload Flick",
+Text = "Unload Nova",
 TextColor3 = Theme.Error,
 TextSize = 13,
 Font = Enum.Font.GothamBold,
@@ -1292,7 +1292,6 @@ MiscCat:AddButton("Anti-Cheat Bypass", function()
 pcall(function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Pixeluted/adoniscries/refs/heads/main/Source.lua"))()
 end)
-Library:Notify("Anti-cheat bypass executed!", "success")
 end)
 MiscCat:AddSeparator()
 MiscCat:AddButton("Rejoin", function()
