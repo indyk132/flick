@@ -1,9 +1,9 @@
 --[[
-Flick Fucker  built on Nova UI Library
+Flick - built on Nova UI Library
 Features: Silent Aim, Aimbot, Trigger Bot, ESP, FOV Circle,
           Radar, FOV Arrows, Hitbox Expander, Crosshair,
-          Config system, Flick Fucker user detection
-Made by @.9177
+          Config system, Flick user detection
+Flick
 ]]
 
 -- UI Modules
@@ -57,7 +57,7 @@ Library.SettingsVisible = false
 -- SCREEN GUI
 -- ============================================================
 
-local ScreenGui = Interface.CreateScreenGui("FlickFuckerUI")
+local ScreenGui = Interface.CreateScreenGui("FlickUI")
 
 local ScreenDPIScale = Interface.New("UIScale", {
 Scale = 1,
@@ -116,7 +116,7 @@ Interface.New("TextLabel", {
 BackgroundTransparency = 1,
 Size = UDim2.new(0, 200, 1, 0),
 Position = UDim2.new(0, 36, 0, 0),
-Text = "Flick Fucker",
+Text = "Flick",
 TextColor3 = Theme.Text,
 TextSize = 16,
 Font = Enum.Font.GothamBold,
@@ -129,7 +129,7 @@ BackgroundTransparency = 1,
 Size = UDim2.new(0, 80, 0, 18),
 Position = UDim2.new(0, 128, 0.5, 0),
 AnchorPoint = Vector2.new(0, 0.5),
-Text = "by @.9177",
+Text = "Flick",
 TextColor3 = Theme.TextMuted,
 TextSize = 11,
 Font = Enum.Font.GothamMedium,
@@ -471,7 +471,7 @@ Interface.New("TextLabel", {
 BackgroundTransparency = 1,
 Size = UDim2.new(1, -34, 1, 0),
 Position = UDim2.new(0, 30, 0, 0),
-Text = "Unload Flick Fucker",
+Text = "Unload Flick",
 TextColor3 = Theme.Error,
 TextSize = 13,
 Font = Enum.Font.GothamBold,
@@ -490,7 +490,7 @@ local AboutSection = CreateSettingsSection("About")
 Interface.New("TextLabel", {
 BackgroundTransparency = 1,
 Size = UDim2.new(1, 0, 0, 24),
-Text = "<b>Flick Fucker</b> - made by @.9177",
+Text = "<b>Flick</b>",
 TextColor3 = Theme.TextMuted,
 TextSize = 12,
 Font = Enum.Font.GothamMedium,
@@ -948,7 +948,7 @@ if gameProcessed then return end
 if input.KeyCode == ToggleKey then Library:Toggle() end
 end)
 -- ============================================================
--- FLICK FUCKER STATE
+-- FLICK STATE
 -- ============================================================
 
 local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
@@ -976,7 +976,7 @@ local radarScale = 1
 local isFovArrowsActive = false
 local crosshairEnabled = false
 
-local flickFuckerUsers = {}
+local flickUsers = {}
 local espObjects = {}
 local radarDots = {}
 local fovArrows = {}
@@ -1114,7 +1114,7 @@ nameTag.Size = 16
 nameTag.Center = true
 nameTag.Outline = true
 nameTag.Font = 2
-nameTag.Text = "Flick Fucker User"
+nameTag.Text = "Flick User"
 
 espObjects[plr] = {
 box = espBox, corners = corners, name = espName, distance = espDistance,
@@ -1464,7 +1464,7 @@ esp.tracer.Color = boxColor
 esp.tracer.Visible = true
 else esp.tracer.Visible = false end
 
-if flickFuckerUsers[plr.UserId] then
+if flickUsers[plr.UserId] then
 local t = tick() * 3
 local r = math.floor(math.sin(t) * 127 + 128)
 local g = math.floor(math.sin(t + 2.1) * 127 + 128)
@@ -1748,12 +1748,12 @@ end
 end)
 
 -- ============================================================
--- FLICK FUCKER USER DETECTION
+-- FLICK USER DETECTION
 -- ============================================================
 
-local function markFlickFuckerUser(userId)
-if not flickFuckerUsers[userId] then
-flickFuckerUsers[userId] = true
+local function markFlickUser(userId)
+if not flickUsers[userId] then
+flickUsers[userId] = true
 for _, plr in pairs(Players:GetPlayers()) do
 if plr.UserId == userId and not espObjects[plr] and plr ~= LocalPlayer then
 createESP(plr)
@@ -1762,7 +1762,7 @@ end
 end
 end
 
-markFlickFuckerUser(LocalPlayer.UserId)
+markFlickUser(LocalPlayer.UserId)
 
 local function sendDetectionMessage()
 pcall(function()
@@ -1785,7 +1785,7 @@ local function detectViaStorage()
 for _, obj in pairs(ReplicatedStorage:GetChildren()) do
 if obj:IsA("StringValue") and string.match(obj.Name, "FF_User_") then
 local uid = tonumber(string.match(obj.Name, "%d+"))
-if uid and uid ~= LocalPlayer.UserId then markFlickFuckerUser(uid) end
+if uid and uid ~= LocalPlayer.UserId then markFlickUser(uid) end
 end
 end
 end
@@ -1793,7 +1793,7 @@ end
 ReplicatedStorage.ChildAdded:Connect(function(child)
 if child:IsA("StringValue") and string.match(child.Name, "FF_User_") then
 local uid = tonumber(string.match(child.Name, "%d+"))
-if uid and uid ~= LocalPlayer.UserId then markFlickFuckerUser(uid) end
+if uid and uid ~= LocalPlayer.UserId then markFlickUser(uid) end
 end
 end)
 
@@ -1801,7 +1801,7 @@ pcall(function()
 TextChatService.MessageReceived:Connect(function(message)
 if message.Text == "." and message.TextSource then
 local uid = message.TextSource.UserId
-if uid ~= LocalPlayer.UserId then markFlickFuckerUser(uid) end
+if uid ~= LocalPlayer.UserId then markFlickUser(uid) end
 end
 end)
 end)
@@ -1814,7 +1814,7 @@ if omdf then
 omdf.OnClientEvent:Connect(function(messageData)
 if messageData and messageData.Message == "." then
 local speaker = Players:FindFirstChild(messageData.FromSpeaker)
-if speaker and speaker ~= LocalPlayer then markFlickFuckerUser(speaker.UserId) end
+if speaker and speaker ~= LocalPlayer then markFlickUser(speaker.UserId) end
 end
 end)
 end
@@ -1870,9 +1870,9 @@ character = char
 task.wait(0.3)
 end)
 
--- Flick Fucker user highlight loop
+-- Flick user highlight loop
 RunService.RenderStepped:Connect(function()
-for userId, _ in pairs(flickFuckerUsers) do
+for userId, _ in pairs(flickUsers) do
 for _, plr in pairs(Players:GetPlayers()) do
 if plr.UserId == userId and plr ~= LocalPlayer and plr.Character then
 for _, part in pairs(plr.Character:GetDescendants()) do
@@ -1904,6 +1904,6 @@ pcall(function() if _G.CrosshairConnection then _G.CrosshairConnection:Disconnec
 ScreenGui:Destroy()
 end)
 
-Library:Notify("Flick Fucker loaded!", "success")
+Library:Notify("Flick loaded!", "success")
 
 return Library
