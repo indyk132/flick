@@ -1,0 +1,9 @@
+{
+	"name": "Flick",
+	"tree": {
+		"$className": "Folder",
+		"Src": {
+			"$path": "Src"
+		}
+	}
+}
